@@ -177,16 +177,16 @@ class MazeView2D:
             raise TypeError("dirs must be a str.")
 
         for dir in dirs:
-            if dir == "S":
+            if dir == "D":
                 line_head = (dx + 1, dy + self.CELL_H)
                 line_tail = (dx + self.CELL_W - 1, dy + self.CELL_H)
-            elif dir == "N":
+            elif dir == "U":
                 line_head = (dx + 1, dy)
                 line_tail = (dx + self.CELL_W - 1, dy)
-            elif dir == "W":
+            elif dir == "L":
                 line_head = (dx, dy + 1)
                 line_tail = (dx, dy + self.CELL_H - 1)
-            elif dir == "E":
+            elif dir == "R":
                 line_head = (dx + self.CELL_W, dy + 1)
                 line_tail = (dx + self.CELL_W, dy + self.CELL_H - 1)
             else:
@@ -284,10 +284,10 @@ class MazeView2D:
 class Maze:
 
     COMPASS = {
-        "N": (0, -1),
-        "E": (1, 0),
-        "S": (0, 1),
-        "W": (-1, 0)
+        "U": (0, -1),
+        "R": (1, 0),
+        "D": (0, 1),
+        "L": (-1, 0)
     }
 
     def __init__(self, maze_cells=None, maze_size=(10,10), has_loops=True, num_portals=0):
@@ -486,10 +486,10 @@ class Maze:
     @classmethod
     def get_walls_status(cls, cell):
         walls = {
-            "N" : (cell & 0x1) >> 0,
-            "E" : (cell & 0x2) >> 1,
-            "S" : (cell & 0x4) >> 2,
-            "W" : (cell & 0x8) >> 3,
+            "U" : (cell & 0x1) >> 0,
+            "R" : (cell & 0x2) >> 1,
+            "D" : (cell & 0x4) >> 2,
+            "L" : (cell & 0x8) >> 3,
         }
         return walls
 
@@ -507,13 +507,13 @@ class Maze:
 
     @classmethod
     def __break_walls(cls, cell, dirs):
-        if "N" in dirs:
+        if "U" in dirs:
             cell |= 0x1
-        if "E" in dirs:
+        if "R" in dirs:
             cell |= 0x2
-        if "S" in dirs:
+        if "D" in dirs:
             cell |= 0x4
-        if "W" in dirs:
+        if "L" in dirs:
             cell |= 0x8
         return cell
 
@@ -526,14 +526,14 @@ class Maze:
         opposite_dirs = ""
 
         for dir in dirs:
-            if dir == "N":
-                opposite_dir = "S"
-            elif dir == "S":
-                opposite_dir = "N"
-            elif dir == "E":
-                opposite_dir = "W"
-            elif dir == "W":
-                opposite_dir = "E"
+            if dir == "U":
+                opposite_dir = "D"
+            elif dir == "D":
+                opposite_dir = "U"
+            elif dir == "R":
+                opposite_dir = "L"
+            elif dir == "L":
+                opposite_dir = "R"
             else:
                 raise ValueError("The only valid directions are (N, S, E, W).")
 

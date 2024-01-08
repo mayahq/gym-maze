@@ -1,17 +1,18 @@
 import numpy as np
 
 import gym
-from gym import error, spaces, utils
-from gym.utils import seeding
+from gymnasium import error, spaces, utils
+from gymnasium.utils import seeding
 from gym_maze.envs.maze_view_2d import MazeView2D
 
 
 class MazeEnv(gym.Env):
     metadata = {
-        "render.modes": ["human", "rgb_array"],
+        "render_modes": ["human", "rgb_array"],
+        "render_fps": 30
     }
 
-    ACTION = ["N", "S", "E", "W"]
+    ACTION = ["L", "D", "R", "U"]
 
     def __init__(self, maze_file=None, maze_size=None, mode=None, enable_render=True):
 
@@ -87,14 +88,22 @@ class MazeEnv(gym.Env):
 
         info = {}
 
-        return self.state, reward, done, info
+        truncated = False
 
-    def reset(self):
+        if self.enable_render:
+            self.render()
+        return self.state, reward, done, truncated, info
+
+    def reset(self, **kwargs):
         self.maze_view.reset_robot()
-        self.state = np.zeros(2)
+        self.state = np.zeros(2, dtype='int64')
         self.steps_beyond_done = None
         self.done = False
-        return self.state
+
+        if self.enable_render:
+            self.render()
+
+        return self.state, {}
 
     def is_game_over(self):
         return self.maze_view.game_over
@@ -104,7 +113,6 @@ class MazeEnv(gym.Env):
             self.maze_view.quit_game()
 
         return self.maze_view.update(mode)
-
 
 class MazeEnvSample5x5(MazeEnv):
 
@@ -155,13 +163,11 @@ class MazeEnvRandom100x100(MazeEnv):
 
 
 class MazeEnvRandom10x10Plus(MazeEnv):
-
     def __init__(self, enable_render=True):
         super(MazeEnvRandom10x10Plus, self).__init__(maze_size=(10, 10), mode="plus", enable_render=enable_render)
 
 
 class MazeEnvRandom20x20Plus(MazeEnv):
-
     def __init__(self, enable_render=True):
         super(MazeEnvRandom20x20Plus, self).__init__(maze_size=(20, 20), mode="plus", enable_render=enable_render)
 
